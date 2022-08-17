@@ -4,5 +4,5 @@
     There are still some bugs so it's still a work in progress.
 ### Scope of usability 
     best field to  use this app is large textes
-###
-    
+### Run package for more information and options
+

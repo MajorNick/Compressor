@@ -52,7 +52,8 @@ func main() {
 	}
 }
 func GetHelp() {
-	fmt.Fprintf(os.Stdout, "Usage: (Option) -path=(\"Actual Path\")\n Options: \n")
+	fmt.Fprintf(os.Stdout, "Usage: (Option) -path=(\"Actual Path\")\n")
+	fmt.Fprintf(os.Stdout, "(Option) -name=(\"Name For Created File\")\n Options: \n")
 	fmt.Fprintf(os.Stdout, " -compress To Compress File  \n -decompress To Decompress File\n")
 	return
 }
