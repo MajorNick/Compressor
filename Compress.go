@@ -2,17 +2,20 @@ package main
 
 import (
 	"fmt"
-	"github.com/icza/bitio"
 	"io"
 	"math"
 	"os"
+
+	"github.com/icza/bitio"
 )
+
+var cnt int = 0
 
 const bitSize int = 12
 
 func Check(err error, s string) {
 	if err != nil {
-		fmt.Println(s)
+
 		os.Exit(1)
 	}
 }
@@ -23,12 +26,8 @@ func Compress(path, filename string) {
 	Check(err, "Error In Reading File")
 	file, err := os.Create(filename)
 	Check(err, "Error In Creating File")
-	var wr io.Writer
-	wr = file
-
+	var wr io.Writer = file
 	w := bitio.NewWriter(wr)
-	err = w.WriteBool(true)
-	Check(err, "error in writing")
 	writeBitSize(w)
 	it := 257
 	if len(data) == 0 {
@@ -41,14 +40,17 @@ func Compress(path, filename string) {
 		} else {
 
 			bits := intToBinary(sequences[tmp])
+
 			for i := 0; i < len(bits); i++ {
 				var b bool
-				if int(bits[i]-'0') == 1 {
+				if bits[i] == '1' {
 					b = true
 				} else {
 					b = false
 				}
 				err = w.WriteBool(b)
+				
+				cnt++
 				Check(err, "Error in Writing in File")
 			}
 
@@ -59,6 +61,7 @@ func Compress(path, filename string) {
 			tmp = string(data[i])
 		}
 	}
+	fmt.Println(cnt)
 	w.Close()
 
 }
@@ -66,7 +69,9 @@ func makeSequenceMap() map[string]int {
 	res := make(map[string]int)
 	for i := 0; i < 256; i++ {
 		res[string(i)] = i
+
 	}
+
 	return res
 }
 func intToBinary(n int) string {
@@ -81,11 +86,14 @@ func intToBinary(n int) string {
 	for i := len(s) - 1; i >= 0; i-- {
 		res += string(s[i])
 	}
+
 	return res
 }
 func writeBitSize(w *bitio.Writer) {
 	str := intToBinary(bitSize)
+
 	str = str[4:]
+
 	for i := 0; i < 8; i++ {
 		var b bool
 		if int(str[i]-'0') == 1 {
@@ -93,7 +101,9 @@ func writeBitSize(w *bitio.Writer) {
 		} else {
 			b = false
 		}
+		cnt++
 		err := w.WriteBool(b)
+	
 		if err != nil {
 			fmt.Println("error in writing file")
 		}

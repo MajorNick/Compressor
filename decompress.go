@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/icza/bitio"
-	"math"
 	"os"
+	"strconv"
+
+	"github.com/icza/bitio"
 )
+var k int  = 0
 
 func Decompress(path, filename string) {
 	red, err := os.Open(path)
@@ -16,12 +18,16 @@ func Decompress(path, filename string) {
 	Check(err, "ERROR IN CREATING FILE")
 	defer f.Close()
 	it := 257
-	size := getLength(readBit)
 
+	size := getLength(readBit)
+	
 	last := ""
 	cur := ""
+	
 	for i := 0; i < size; i++ {
+		
 		bit, err := readBit.ReadBool()
+		k++
 		Check(err, "ERROR IN READING")
 		cur += returnBit(bit)
 	}
@@ -39,6 +45,7 @@ func Decompress(path, filename string) {
 		t = false
 		for i := 0; i < size; i++ {
 			bit, err := readBit.ReadBool()
+			k++
 			if err != nil {
 				t = true
 			}
@@ -49,9 +56,9 @@ func Decompress(path, filename string) {
 		}
 
 		tmp := binToInt(byte)
-		fmt.Println(tmp)
+		
 		byte = ""
-		if seqMap[n] == "" {
+		if seqMap[tmp] == "" {
 			data = seqMap[n]
 			data += last
 		} else {
@@ -70,27 +77,29 @@ func Decompress(path, filename string) {
 
 	}
 	f.Write([]byte(writenData))
+	
 
 }
 
 // helper function
 func binToInt(bin string) int {
-	res := 0
-	for i := 0; i < len(bin); i++ {
-		res += (int(bin[i]) - int('0')) * int(math.Pow(2, float64(len(bin)-i-1)))
-	}
-	return res
+
+	res, err := strconv.ParseInt(bin, 2, 64)
+	Check(err, "error in converting string to binary")
+	fmt.Print()
+	return int(res)
 }
 
 func getLength(rd *bitio.Reader) int {
 	var bin string
-	for i := 0; i < 9; i++ {
+	for i := 0; i < 8; i++ {
 		bit, err := rd.ReadBool()
 		Check(err, "ERROR IN READING")
+		k++
 		bin += returnBit(bit)
 	}
-	res := binToInt(bin[1:])
-
+	res := binToInt(bin)
+	
 	return res
 }
 func makeMap() map[int]string {
